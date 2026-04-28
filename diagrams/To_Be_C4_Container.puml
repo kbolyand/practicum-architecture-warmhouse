@@ -1,0 +1,97 @@
+@startuml
+title ИС Умный Дом To Be Container Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(User, "Пользователь", "Пользователь ИС Умный Дом")
+Person(ClientSpecialist, "Специалист по обслуживанию клиентов", "Специалист по обслуживанию клиентов")
+Person(SalesAndMarketingSpecialist, "Специалист по продажам и маркетингу", "Специалист по продажам и маркетингу")
+System(SmartHomeSystem, "ИС Умный Дом", "ИС Умный Дом")
+System(WarmSystem1, "Система отдельного дома 1", "Система отдельного дома с модулями и устройствами")
+System(WarmSystem2, "Система отдельного дома 2", "Система отдельного дома с модулями и устройствами")
+
+System_Ext(Bank, "ИС Банк", "Внешний банк для приема платежей")
+
+Container_Boundary(SmartHomeSystem, "ИС Умный Дом") {
+  Container(WebApp, "Web приложение", "React", "Предоставляет взаимодействие с системой через браузер")
+
+  Container(MobileApp, "Мобильное приложение", "Kotlin / Swift", "Предоставляет взаимодействие с системой через мобильное приложение")
+
+  Container(ApiGateway, "API Gateway", "Go / Java", "Маршрутизация запросов")
+
+  Container(CoreService, "Ядро", "Go / Java + BPM engine", "Основной микросервис для предоставления бизнес - логики ИС Умный Дом")
+  Container(CoreServiceDB, "База данных", "PostgreSQL", "Хранения информации о проведенных операциях")
+
+  Container(PaymentService, "Сервис оплаты", "Go / Java", "Оплата модулей, устройств и подписок")
+  Container(PaymentServiceDB, "База данных", "PostgreSQL", "Хранение информации об оплате")
+
+  Container(DeviceService, "Сервис управления устройствами", "Go / Java", "Управление модулями и устройствами")
+  Container(DeviceServiceDB, "База данных", "PostgreSQL", "Хранение информации о модулях и устройствах")
+
+  Container(TelemetryService, "Сервис телеметрии", "Go / Java", "Сбор и хранение данных с модулей и устройств")
+  Container(TelemetryServiceDB, "База данных", "Clickhouse, VictoriaMetrics", "Хранение информации об телеметрии")
+
+  Container(ScenarioService, "Сервис управления сценариями", "Go / Java", "Управление сценариями")
+  Container(ScenarioServiceDB, "База данных", "PostgreSQL", "Хранение информации о сценариях")
+
+  Container(MarketService, "Сервис продажи устройств", "Go / Java / etc", "Продажа модулей и устройств ИС Умный Дом")
+  Container(MarketServiceDB, "База данных", "PostgreSQL", "Хранение информации для продажи модулей и устройств")
+
+  Container(UserService, "Сервис управления пользователями", "Go / Java / etc", "Управление пользователями и правами доступа")
+  Container(UserServiceDB, "База данных", "PostgreSQL", "Хранение информации о пользователях")
+}
+
+Rel(CoreService, CoreServiceDB, "Чтение и запись информации")
+Rel(PaymentService, PaymentServiceDB, "Чтение и запись информации")
+Rel(DeviceService, DeviceServiceDB, "Чтение и запись информации")
+Rel(TelemetryService, TelemetryServiceDB, "Чтение и запись информации")
+Rel(ScenarioService, ScenarioServiceDB, "Чтение и запись информации")
+Rel(MarketService, MarketServiceDB, "Чтение и запись информации")
+Rel(UserService, UserServiceDB, "Чтение и запись информации")
+
+
+
+Rel(User, WebApp, "Самостоятельно подключается к ИС Умный Дом")
+Rel(User, WebApp, "Приобретение новых модулей и устройств")
+Rel(User, WebApp, "Подключает и управляет модулями и устройствами")
+Rel(User, WebApp, "Конфигурирует сценарии работы")
+Rel(User, WebApp, "Просматривает телеметрию")
+Rel(User, WebApp, "Оплачивает сервис ИС Умный Дом")
+
+Rel(User, MobileApp, "Самостоятельно подключается к ИС Умный Дом")
+Rel(User, MobileApp, "Приобретение новых модулей и устройств")
+Rel(User, MobileApp, "Подключает и управляет модулями и устройствами")
+Rel(User, MobileApp, "Конфигурирует сценарии работы")
+Rel(User, MobileApp, "Просматривает телеметрию")
+Rel(User, MobileApp, "Оплачивает сервис ИС Умный Дом")
+
+Rel(ClientSpecialist, WebApp, "Управляет пользователями ИС Умный Дом(регистрация, вопросы оплаты, пробный период и т.д.)")
+Rel(ClientSpecialist, WebApp, "Подключение модулей, устройств и поддержка")
+Rel(ClientSpecialist, MobileApp, "Управляет пользователями ИС Умный Дом(регистрация, вопросы оплаты, пробный период и т.д.)")
+Rel(ClientSpecialist, MobileApp, "Подключение модулей, устройств и поддержка")
+
+Rel(SalesAndMarketingSpecialist, WebApp, "Публикация предложения по приобретению новых модулей и устройств ИС Умный Дом")
+
+Rel(WebApp, ApiGateway, "Отправка запроса на действие")
+Rel(MobileApp, ApiGateway, "Отправка запроса на действие")
+
+Rel(ApiGateway, UserService, "Управление пользователями, аутентификация и авторизация пользователей")
+Rel(UserService, CoreService, "Получение необходимой информации для проверки выполнения операций(оплата и т.п.)")
+Rel(ApiGateway, CoreService, "Выполнение основных операций и бизнес процессов")
+Rel(ApiGateway, MarketService, "Просмотр и приобретение новых модулей и устройств")
+Rel(MarketService, DeviceService, "Получение данных об модулях и устройствах(информация о владении, характеристики и т.д.)")
+Rel(MarketService, CoreService, "Запрос на приобретение и регистрацию нового модуля и устройства для пользователя")
+Rel(CoreService, DeviceService, "Чтение и обновление информации о действующих модулях и устройствах и владении")
+Rel(CoreService, PaymentService, "Актуализация информации об операциях оплаты модулей, устройств и подписки")
+Rel(PaymentService, Bank, "Оплата устройств и подписки")
+Rel(ApiGateway, DeviceService, "Просмотр информации об устройствах, подключение и управление модулями и устройствами")
+Rel(DeviceService, WarmSystem1, "Запрос данных с модулей и устройств")
+Rel(DeviceService, WarmSystem2, "Управление модулями и устройствами")
+Rel(ApiGateway, TelemetryService, "Просмотр телеметрии")
+Rel(TelemetryService, DeviceService, "Сбор телеметрии")
+Rel(ApiGateway, ScenarioService, "Работа со сценариями")
+Rel(ScenarioService, DeviceService, "Проверка данных для выполнения сценария, выполнение сценария")
+Rel(ScenarioService, CoreService, "Чтение и актуализация данных для сценариев")
+@enduml
