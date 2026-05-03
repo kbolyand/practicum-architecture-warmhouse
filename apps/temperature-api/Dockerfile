@@ -1,0 +1,12 @@
+FROM gradle:jdk25 AS builder
+WORKDIR /build
+COPY build.gradle settings.gradle ./
+RUN gradle dependencies --no-daemon
+COPY src ./src
+RUN gradle build --no-daemon -x test
+
+FROM eclipse-temurin:25-jre-alpine
+WORKDIR /app
+COPY --from=builder /build/build/libs/*.jar app.jar
+EXPOSE 8081
+ENTRYPOINT ["java", "-jar", "app.jar"]

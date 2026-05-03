@@ -1,0 +1,38 @@
+@startuml
+title ИС Умный Дом - API Gateway Component Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+Container(WebApp, "Web приложение", "React", "Предоставляет взаимодействие с системой через браузер")
+Container(MobileApp, "Мобильное приложение", "Kotlin / Swift", "Предоставляет взаимодействие с системой через мобильное приложение")
+Container(UserService, "Сервис управления пользователями", "Java, Spring")
+Container(MarketService, "Сервис продажи модулей и устройств ИС Умный Дом", "Java, Spring")
+Container(CoreService, "Основной микросервис для предоставления бизнес - логики ИС Умный Дом и оркестрации микросервисов", "Java, Spring")
+Container(PaymentService, "Сервис оплаты", "Java, Spring")
+Container(DeviceService, "Сервис управления устройствами", "Java, Spring")
+Container(TelemetryService, "Сервис телеметрии", "Java, Spring")
+Container(ScenarioService, "Сервис управления сценариями", "Java, Spring")
+
+Container(ApiGateway, "API Gateway", "Java, Spring") {
+  Component(CheckTokenFilter, "Check Token Filter", "Пересылает токен запроса на проверку")
+  Component(AuthorizationFilter, "Authorization Filter", "Проверяет может ли пользователь выполнить данную операцию")
+  Component(RoutingFilter, "Routing Filter", "Перенаправляет запрос")
+}
+
+
+Rel(WebApp, ApiGateway, "Запросы от пользователя", "HTTP / REST")
+Rel(MobileApp, ApiGateway, "Запросы от пользователя", "HTTP / REST")
+
+Rel(RoutingFilter, UserService, "Аутентификация и авторизация пользователя и получение токена для выполнения операции", "HTTP / REST")
+Rel(CheckTokenFilter, UserService, "Проверка токена", "HTTP / REST")
+Rel(RoutingFilter, UserService, "Перенаправляет входящий запрос(например, для получения информации о пользователе)", "HTTP / REST")
+Rel(RoutingFilter, MarketService, "Перенаправляет входящий запрос(например, для получения рекомендаций для приобретения)", "HTTP / REST")
+Rel(RoutingFilter, CoreService, "Перенаправляет входящий запрос для обработки основной бизнес логики", "HTTP / REST")
+Rel(RoutingFilter, PaymentService, "Перенаправляет входящий запрос(например, для осуществления оплаты)", "HTTP / REST")
+Rel(RoutingFilter, DeviceService, "Перенаправляет входящий запрос(например, для получения информации с устройства или списка устройств пользователя)", "HTTP / REST")
+Rel(RoutingFilter, TelemetryService, "Перенаправляет входящий запрос(например, для получения телеметрии)", "HTTP / REST")
+Rel(RoutingFilter, ScenarioService, "Перенаправляет входящий запрос(например, для получения списка сценариев)", "HTTP / REST")
+
+
+@enduml

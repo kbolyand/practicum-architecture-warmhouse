@@ -1,0 +1,30 @@
+@startuml
+title ИС Умный Дом - Scenario Service Component Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+Container(ApiGateway, "API Gateway", "Java, Spring")
+Container(CoreService, "Основной микросервис бизнес-логики", "Java, Spring")
+Container(DeviceService, "Сервис управления устройствами", "Java, Spring")
+
+Container(TelemetryService, "Сервис телеметрии", "Java, Spring")
+Container(ScenarioServiceDB, "База данных устройств", "Postgres")
+
+Container(ScenarioService, "Сервис управления сценариями", "Java, Spring") {
+  Component(ScenarioServiceController, "API сервиса телеметрии")
+  Component(ScenarioServiceLayer, "Service Layer", "Бизнес логика")
+  Component(ScenarioServiceRepositoryLayer, "Repository Layer", "Data access logic")
+}
+
+Rel(ScenarioServiceController, ScenarioServiceLayer, "Использует")
+Rel(ScenarioServiceLayer, ScenarioServiceRepositoryLayer, "Использует")
+Rel(ScenarioServiceRepositoryLayer, ScenarioServiceDB, "Чтение / Запись", "SQL")
+
+Rel(ScenarioServiceLayer, CoreService, "Использует", "HTTP / REST")
+Rel(ScenarioServiceLayer, TelemetryService, "Использует", "HTTP / REST")
+Rel(ScenarioServiceLayer, DeviceService, "Использует", "HTTP / REST")
+
+Rel(ApiGateway, ScenarioServiceController, "Использует", "HTTP / REST")
+
+@enduml

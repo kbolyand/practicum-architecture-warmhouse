@@ -8,13 +8,13 @@
 
 **Управление отоплением:**
 
-- Пользователи могут управлять отоплением в доме. 
+- Пользователи могут удаленно управлять отоплением в доме. 
 - Система поддерживает только синхронное управление от сервера к датчику. 
 - Система не поддерживает асинхронные вызовы. 
 
 **Мониторинг температуры:**
 
-- Пользователи могут проверять температуру.
+- Пользователи могут удаленно проверять температуру.
 - Система поддерживает только получение температуры через запрос от сервера к датчику.
 - Система не поддерживает реактивное взаимодействие от датчика к серверу.
 
@@ -36,8 +36,9 @@
 Домен: управление модулями и устройствами(отопление, свет, ворота, наблюдение)
 - поддомен подключение модуля и устройства
   - контекст: подключение устройства 
-- поддомен управление модулем и устройством
-    - контекст: управление устройства
+- поддомен каталог модулей и устройств
+- поддомен управления
+    - контекст: управление модулями и устройствами
 
 Домен: сценарии управления 
 - контекст: сценарии управления модулями и устройствами
@@ -51,14 +52,19 @@
 - поддомен оплаты модулей и устройств
 - поддомен оплаты подписки к ИС Умный Дом 
 
+Домен: пользователи и роли
+- поддомен управлениями пользователями системы и их ролями
+- поддомен аутентификации и авторизации действий пользователей
+
 ### **4. Проблемы монолитного решения**
+- Синхронная блокирующая обработка запросов.
+- Может отказать вся система при критической ошибке в какой-то части функциональности. 
+- Высокий риск сбоев при изменениях.
+- Надо тестировать все приложение целиком при изменениях. 
 - Внесение изменений потребует перезапуска всего приложения.
 - Масштабирование только для приложения целиком.
 - Единый маленький стек технологий для всего приложения(сложно реализовывать разные виды взаимодействия, ограничения 
 по возможностям языка программирования и так далее).
-- Может отказать вся система при критической ошибке в какой-то части функциональности.
-- Высокий риск сбоев при изменениях.
-- Надо тестировать все приложение целиком при изменениях.
 
 ### 5. Визуализация контекста системы — диаграмма С4
 
@@ -67,7 +73,7 @@
 Чтобы добавить ссылку в файл Readme.md, нужно использовать синтаксис Markdown. Это делают так:
 
 [C4 - Context](diagrams/As_Is_C4_Context.puml)
-![C4 - Context](diagrams/images/As_Is_C4_Context-___As_Is_Context_Diagram.png)
+![C4 - Context](diagrams/images/As_Is_C4_Context.png)
 
 # Задание 2. Проектирование микросервисной архитектуры
 
@@ -76,11 +82,34 @@
 **Диаграмма контейнеров (Containers)**
 
 [C4 - Containers](diagrams/To_Be_C4_Container.puml)
-![C4 - Containers](diagrams/images/To_Be_C4_Container-___To_Be_Container_Diagram.png)
+![C4 - Containers](diagrams/images/To_Be_C4_Container.png)
 
 **Диаграмма компонентов (Components)**
 
-Добавьте диаграмму для каждого из выделенных микросервисов.
+[C4 - Component - ApiGateway](diagrams/To_Be_C4_Component_ApiGateway.puml)
+![C4 - Component - ApiGateway](diagrams/images/To_Be_C4_Container.png)
+
+[C4 - Component - CoreService](diagrams/To_Be_C4_Component_CoreService.puml)
+![C4 - Component - CoreService](diagrams/images/To_Be_C4_Component_CoreService.png)
+
+[C4 - Component - DeviceService](diagrams/To_Be_C4_Component_DeviceService.puml)
+![C4 - Component - DeviceService](diagrams/images/To_Be_C4_Component_DeviceService.png)
+
+[C4 - Component - MarketService](diagrams/To_Be_C4_Component_MarketService.puml)
+![C4 - Component - MarketService](diagrams/images/To_Be_C4_Component_MarketService.png)
+
+[C4 - Component - PaymentService](diagrams/To_Be_C4_Component_PaymentService.puml)
+![C4 - Component - PaymentService](diagrams/images/To_Be_C4_Component_PaymentService.png)
+
+[C4 - Component - ScenarioService](diagrams/To_Be_C4_Component_ScenarioService.puml)
+![C4 - Component - ScenarioService](diagrams/images/To_Be_C4_Component_ScenarioService.png)
+
+[C4 - Component - TelemetryService](diagrams/To_Be_C4_Component_TelemetryService.puml)
+![C4 - Component - TelemetryService](diagrams/images/To_Be_C4_Component_TelemetryService.png)
+
+[C4 - Component - UserService](diagrams/To_Be_C4_Component_UserService.puml)
+![C4 - Component - UserService](diagrams/images/To_Be_C4_Component_UserService.png)
+
 
 **Диаграмма кода (Code)**
 
@@ -88,13 +117,17 @@
 
 # Задание 3. Разработка ER-диаграммы
 
-Добавьте сюда ER-диаграмму. Она должна отражать ключевые сущности системы, их атрибуты и тип связей между ними.
+[ER-диаграмма](diagrams/ER.puml)
+![ER-диаграмма](diagrams/images/ER.png)
 
 # Задание 4. Создание и документирование API
 
 ### 1. Тип API
 
 Укажите, какой тип API вы будете использовать для взаимодействия микросервисов. Объясните своё решение.
+Для взаимодействия между микросервисами для начала я бы предложил использовать REST API.
+REST API прост в использовании, синхронный, удобно документирован, стандартизирован, версионируемый. Но в дальнейшем 
+для взаимодействия между некоторыми микросервисами я бы добавил асинхронное взаимодействие через брокер сообщений, напрмиер, Kafka.
 
 ### 2. Документация API
 

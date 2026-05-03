@@ -1,0 +1,83 @@
+@startuml
+
+title ИС Умный Дом - ER Diagram
+
+entity User {
+  *id : integer
+  username : string
+  password_hash : string
+  first_name : string
+  middle_name : string
+  last_name : string
+  email : string
+  phone : string
+}
+
+entity Role {
+  *id : integer
+  role_name : string
+}
+
+entity UserRole {
+  *user_id : integer
+  *role_id : integer
+}
+
+entity House {
+  *id : integer
+  user_id : integer
+  address : string
+}
+
+entity Device {
+  *id : integer
+  parent_module_id : integer
+  house_id : integer
+  type_id : integer
+  model_id: integer
+  serial_number : string
+  status : string
+  additional_infon : string
+}
+
+entity DeviceType {
+  *id : integer
+  name : string
+  description : text
+}
+
+entity Model {
+  *id : integer
+  name : string
+  description : text
+}
+
+entity Module {
+  *id : integer
+  model_id: integer
+  house_id : integer
+  name : string
+  description : text
+}
+
+entity TelemetryData {
+  *id : integer
+  device_id : integer
+  metric : string
+  timestamp : datetime
+  value : double
+}
+
+User ||--o{ UserRole
+Role ||--o{ UserRole
+
+User "1..*" -- "*" House : has
+House "1..*" -- "*" Device : contains
+House "1..*" -- "*" Module : contains
+Device "1" -- "1" DeviceType : has type
+Device "1" -- "1" Model : has model
+Module "1" -- "1" Model : has model
+Module "1..*" o-- "1..*" Device : contains
+Device "1" -- "*" TelemetryData : generates
+
+@enduml
