@@ -22,7 +22,7 @@ services:
       - smarthome-network
 
   temperature-api:
-    image: temperature-api
+    image: kbolyand/temperature-api
     container_name: temperature-api
     ports:
       - "8081:8081"
