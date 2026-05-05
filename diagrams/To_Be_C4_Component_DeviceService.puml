@@ -1,0 +1,53 @@
+@startuml
+title ИС Умный Дом - Device Service Component Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+Container(ApiGateway, "API Gateway", "Java, Spring")
+Container(MarketService, "Сервис продажи модулей и устройств ИС Умный Дом", "Java, Spring")
+Container(CoreService, "Основной микросервис бизнес-логики", "Java, Spring")
+Container(TelemetryService, "Сервис телеметрии", "Java, Spring")
+Container(ScenarioService, "Сервис управления сценариями", "Java, Spring")
+Container(DeviceServiceDB, "База данных устройств", "Postgres")
+System_Ext(HomeDevice, "Модуль и/или устройство")
+
+Container(DeviceService, "Сервис управления устройствами", "Java, Spring") {
+  Component(DeviceCatalogueController, "API каталога устройств")
+  Component(UserDeviceController, "API для получения и обновления информации об устройствах пользователя и устройствах, доступных для приобретения")
+  Component(DeviceManagementController, "API для управления устройствами")
+  Component(DeviceTelemetryController, "API для сбора телеметрии")
+  Component(DeviceServiceLayer, "Service Layer", "Бизнес логика")
+  Component(ManagementConnectionLayer, "Management Connector Layer", "Логика коннекторов к устройствам для управления")
+  Component(TelemetryConnectionLayer, "Telemetry Connector Layer", "Логика коннекторов к устройствам для сбора телеметрии")
+  Component(DeviceServiceRepositoryLayer, "Repository Layer", "Data access logic")
+}
+
+Rel(DeviceCatalogueController, DeviceServiceLayer, "Использует")
+Rel(UserDeviceController, DeviceServiceLayer, "Использует")
+Rel(DeviceManagementController, DeviceServiceLayer, "Использует")
+Rel(DeviceTelemetryController, DeviceServiceLayer, "Использует")
+Rel(DeviceServiceLayer, ManagementConnectionLayer, "Использует")
+Rel(DeviceServiceLayer, TelemetryConnectionLayer, "Использует")
+Rel(DeviceServiceLayer, DeviceServiceRepositoryLayer, "Использует")
+Rel(ManagementConnectionLayer, HomeDevice, "Использует", "SSH/ Zegbee / etc")
+Rel(TelemetryConnectionLayer, HomeDevice, "Использует", "SSH/ Zegbee / etc")
+Rel(DeviceServiceRepositoryLayer, DeviceServiceDB, "Чтение / Запись", "SQL")
+
+Rel(ApiGateway, DeviceCatalogueController, "Использует", "HTTP / REST")
+Rel(ApiGateway, UserDeviceController, "Использует", "HTTP / REST")
+Rel(ApiGateway, DeviceManagementController, "Использует", "HTTP / REST")
+Rel(ApiGateway, DeviceTelemetryController, "Использует", "HTTP / REST")
+
+Rel(MarketService, DeviceCatalogueController, "Использует", "HTTP / REST")
+Rel(MarketService, UserDeviceController, "Использует", "HTTP / REST")
+
+Rel(CoreService, UserDeviceController, "Использует", "HTTP / REST")
+Rel(CoreService, DeviceManagementController, "Использует", "HTTP / REST")
+
+Rel(TelemetryService, DeviceTelemetryController, "Использует", "HTTP / REST")
+
+Rel(ScenarioService, DeviceTelemetryController, "Использует", "HTTP / REST")
+Rel(ScenarioService, DeviceManagementController, "Использует", "HTTP / REST")
+
+@enduml

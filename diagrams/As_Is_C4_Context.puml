@@ -1,0 +1,26 @@
+@startuml
+title ИС Умный Дом As-Is Context Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubUsercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(User, "Пользователь", "Пользователь ИС Умный Дом")
+Person(ConnectionSpecialist, "Специалист по подключению", "Специалист по подключению к ИС Умный Дом")
+System(SmartHomeSystem, "ИС Умный Дом", "ИС Умный Дом")
+System(WarmSystem1, "Система отопления отдельного дома 1", "Система отопления отдельного дома с датчиками")
+System(WarmSystem2, "Система отопления отдельного дома 2", "Система отопления отдельного дома с датчиками")
+System(WarmSystem3, "Система отопления отдельного дома 3", "Система отопления отдельного дома с датчиками")
+
+Rel(User, SmartHomeSystem, "Управляет отоплением")
+Rel(User, SmartHomeSystem, "Просмотр температуры через Web интерфейс")
+Rel(ConnectionSpecialist, SmartHomeSystem, "Подключает систему отопления отдельного дома с датчиками")
+Rel(ConnectionSpecialist, SmartHomeSystem, "Регистрация новых пользователей в ИС Умный Дом")
+Rel(SmartHomeSystem, WarmSystem1, "Запрос данных с датчиков")
+Rel(SmartHomeSystem, WarmSystem1, "Управляет отоплением")
+Rel(SmartHomeSystem, WarmSystem2, "Запрос данных с датчиков")
+Rel(SmartHomeSystem, WarmSystem2, "Управляет отоплением")
+Rel(SmartHomeSystem, WarmSystem3, "Запрос данных с датчиков")
+Rel(SmartHomeSystem, WarmSystem3, "Управляет отоплением")
+
+@enduml

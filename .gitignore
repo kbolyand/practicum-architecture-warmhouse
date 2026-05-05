@@ -192,3 +192,18 @@ build/
 
 tmp/
 task-*
+
+
+apps/temperature-api/.gradle
+apps/temperature-api/gradle
+apps/temperature-api/build/
+apps/temperature-api/gradlew
+apps/temperature-api/gradlew.bat
+
+### IntelliJ IDEA ###
+apps/temperature-api/.idea
+apps/temperature-api/*.iws
+apps/temperature-api/*.iml
+apps/temperature-api/*.ipr
+apps/temperature-api/out/
+

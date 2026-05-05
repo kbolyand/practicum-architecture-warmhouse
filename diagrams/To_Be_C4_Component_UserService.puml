@@ -1,0 +1,31 @@
+@startuml
+title ИС Умный Дом  - User Service Component Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+Container(ApiGateway, "API Gateway", "Java, Spring")
+Container(CoreService, "Основной микросервис для предоставления бизнес - логики ИС Умный Дом и оркестрации микросервисов", "Java, Spring")
+Container(UserServiceDB, "База данных пользователей", "Postgres")
+
+Container(UserService, "Сервис управления пользователями", "Java, Spring") {
+  Component(AuthController, "Auth Controller", "Проверяет логин и пароль, при успехе возвращает токен с правами для выполнения запросов")
+  Component(CheckTokenController, "Check Token Controller", "Проверяет валидность выданного токена")
+  Component(UserController, "User Controller", "Управление пользователями")
+  Component(UserServiceLayer, "Service Layer", "Бизнес логика по управлению пользователями + A&A")
+  Component(UserServiceRepositoryLayer, "Repository Layer", "Data access logic")
+}
+
+Rel(AuthController, UserServiceLayer, "Использует")
+Rel(CheckTokenController, UserServiceLayer, "Использует")
+Rel(UserController, UserServiceLayer, "Использует")
+Rel(UserServiceLayer, UserServiceRepositoryLayer, "Использует")
+Rel(UserServiceRepositoryLayer, UserServiceDB, "Чтение / Запись", "SQL")
+
+Rel(ApiGateway, AuthController, "Аутентификация и авторизация пользователя и получение токена для выполнения операции", "HTTP / REST")
+Rel(ApiGateway, CheckTokenController, "Проверка токена", "HTTP / REST")
+Rel(ApiGateway, UserController, "Управление пользователями", "HTTP / REST")
+
+Rel(CoreService, UserController, "Управление пользователями", "HTTP / REST")
+
+@enduml

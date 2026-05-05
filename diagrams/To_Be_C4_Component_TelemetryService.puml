@@ -1,0 +1,32 @@
+@startuml
+title ИС Умный Дом - Telemetry Service Component Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+Container(ApiGateway, "API Gateway", "Java, Spring")
+Container(CoreService, "Основной микросервис бизнес-логики", "Java, Spring")
+Container(DeviceService, "Сервис управления устройствами", "Java, Spring")
+Container(ScenarioService, "Сервис управления сценариями", "Java, Spring")
+Container(TelemetryServiceDB, "База данных устройств", "VictoriaMetrics / Clickhouse")
+System_Ext(HomeDevice, "Модуль и/или устройство")
+
+Container(TelemetryService, "Сервис телеметрии", "Java, Spring") {
+  Component(TelemetryServiceController, "API сервиса телеметрии")
+  Component(TelemetryServiceLayer, "Service Layer", "Бизнес логика")
+  Component(TelemetryServiceRepositoryLayer, "Repository Layer", "Data access logic")
+}
+
+Rel(TelemetryServiceController, TelemetryServiceLayer, "Использует")
+Rel(TelemetryServiceLayer, TelemetryServiceRepositoryLayer, "Использует")
+Rel(TelemetryServiceLayer, HomeDevice, "Использует", "SSH / Zegbee")
+Rel(TelemetryServiceRepositoryLayer, TelemetryServiceDB, "Чтение / Запись", "SQL")
+Rel(TelemetryServiceLayer, CoreService, "Использует", "HTTP / REST")
+Rel(TelemetryServiceLayer, DeviceService, "Использует", "HTTP / REST")
+
+Rel(ApiGateway, TelemetryServiceController, "Использует", "HTTP / REST")
+Rel(ScenarioService, TelemetryServiceController, "Использует", "HTTP / REST")
+
+
+
+@enduml

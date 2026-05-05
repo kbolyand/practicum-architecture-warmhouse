@@ -1,0 +1,29 @@
+@startuml
+title ИС Умный Дом - Market Service Component Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+Container(ApiGateway, "API Gateway", "Java, Spring")
+Container(UserService, "Сервис управления пользователями", "Java, Spring")
+Container(CoreService, "Основной микросервис бизнес-логики", "Java, Spring")
+Container(DeviceService, "Сервис управления устройствами", "Java, Spring")
+Container(MarketServiceDB, "База данных", "Postgres")
+
+Container(MarketService, "Сервис продажи модулей и устройств", "Java, Spring") {
+  Component(MarketServiceController, "Market Service Controller", "API для предложения устройств к приобретению и запуска покупки")
+  Component(MarketServiceLayer, "Service Layer", "Бизнес логика по продажи модулей и устройств ИС Умный Дом")
+  Component(MarketServiceRepositoryLayer, "Repository Layer", "Data access logic")
+}
+
+Rel(ApiGateway, MarketServiceController, "Запросы от пользователя", "HTTP / REST")
+Rel(MarketServiceController, MarketServiceLayer, "Использует")
+Rel(MarketServiceLayer, MarketServiceRepositoryLayer, "Использует")
+Rel(MarketServiceRepositoryLayer, MarketServiceDB, "Чтение / Запись", "SQL")
+
+Rel(MarketServiceLayer, UserService, "Использует", "HTTP / REST")
+Rel(MarketServiceLayer, CoreService, "Использует", "HTTP / REST")
+Rel(MarketServiceLayer, DeviceService, "Использует", "HTTP / REST")
+
+
+@enduml

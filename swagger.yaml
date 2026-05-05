@@ -1,0 +1,578 @@
+openapi: 3.0.0
+info:
+  title: Device Service API
+  version: 1.0.0
+  description: API для управления модулями и устройствами, выполнения операций
+
+paths:
+  /modules:
+    get:
+      tags:
+        - Catalogue
+      summary: Получить список всех модулей с пагинацией
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: Номер страницы (начиная с 0)
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+          description: Количество элементов на странице
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageModule'
+    post:
+      tags:
+        - Modules CRUD
+      summary: Создать новый модуль
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModuleCreateRequest'
+      responses:
+        '201':
+          description: Модуль создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Module'
+  /devices:
+    get:
+      tags:
+        - Catalogue
+      summary: Получить список всех устройств с пагинацией
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageDevice'
+    post:
+      tags:
+        - Devices CRUD
+      summary: Создать новое устройство
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceCreateRequest'
+      responses:
+        '201':
+          description: Устройство создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+  /users/{userId}/modules:
+    get:
+      tags:
+        - Users
+      summary: Получить все модули конкретного пользователя (с пагинацией)
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID пользователя
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageModule'
+  /users/{userId}/devices:
+    get:
+      tags:
+        - Users
+      summary: Получить все устройства конкретного пользователя (с пагинацией)
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageDevice'
+  /modules/{id}:
+    get:
+      tags:
+        - Modules CRUD
+      summary: Получить модуль по ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Module'
+        '404':
+          description: Модуль не найден
+    put:
+      tags:
+        - Modules CRUD
+      summary: Обновить существующий модуль
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModuleUpdateRequest'
+      responses:
+        '200':
+          description: Модуль обновлён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Module'
+        '404':
+          description: Модуль не найден
+    delete:
+      tags:
+        - Modules CRUD
+      summary: Удалить модуль
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Модуль удалён
+        '404':
+          description: Модуль не найден
+  /devices/{id}:
+    get:
+      tags:
+        - Devices CRUD
+      summary: Получить устройство по ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '404':
+          description: Устройство не найдено
+    put:
+      tags:
+        - Devices CRUD
+      summary: Обновить существующее устройство
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceUpdateRequest'
+      responses:
+        '200':
+          description: Устройство обновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '404':
+          description: Устройство не найдено
+    delete:
+      tags:
+        - Devices CRUD
+      summary: Удалить устройство
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Устройство удалено
+        '404':
+          description: Устройство не найдено
+
+  /modules/{moduleId}/operations:
+    get:
+      tags:
+        - Operations
+      summary: Получить список доступных операций для модуля
+      parameters:
+        - name: moduleId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Список операций
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Operation'
+  /devices/{deviceId}/operations:
+    get:
+      tags:
+        - Operations
+      summary: Получить список доступных операций для устройства
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Список операций
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Operation'
+
+  /modules/{moduleId}/operations/{operationId}/execute:
+    post:
+      tags:
+        - Operations
+      summary: Выполнить операцию на модуле
+      parameters:
+        - name: moduleId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: operationId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Дополнительные параметры для выполнения операции (если необходимы)
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Операция выполнена успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationResult'
+        '400':
+          description: Ошибка выполнения операции
+  /devices/{deviceId}/operations/{operationId}/execute:
+    post:
+      tags:
+        - Operations
+      summary: Выполнить операцию на устройстве
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: operationId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Операция выполнена успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationResult'
+        '400':
+          description: Ошибка выполнения операции
+
+  /device-types:
+    get:
+      tags:
+        - Catalogue
+      summary: Получить список всех типов устройств
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceType'
+  /models:
+    get:
+      tags:
+        - Catalogue
+      summary: Получить список всех моделей
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Model'
+
+components:
+  schemas:
+    # Пагинация
+    PageMetadata:
+      type: object
+      properties:
+        size:
+          type: integer
+          description: Количество элементов на странице
+        number:
+          type: integer
+          description: Номер текущей страницы
+        totalElements:
+          type: integer
+          description: Общее количество элементов
+        totalPages:
+          type: integer
+          description: Общее количество страниц
+    PageModule:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Module'
+        page:
+          $ref: '#/components/schemas/PageMetadata'
+    PageDevice:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Device'
+        page:
+          $ref: '#/components/schemas/PageMetadata'
+
+    # Сущности
+    Module:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Уникальный идентификатор модуля
+        model_id:
+          type: integer
+        house_id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+    ModuleCreateRequest:
+      type: object
+      required:
+        - model_id
+        - house_id
+        - name
+      properties:
+        model_id:
+          type: integer
+        house_id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+    ModuleUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+
+    Device:
+      type: object
+      properties:
+        id:
+          type: integer
+        parent_module_id:
+          type: integer
+          nullable: true
+        house_id:
+          type: integer
+        type_id:
+          type: integer
+        model_id:
+          type: integer
+        serial_number:
+          type: string
+        status:
+          type: string
+          description: Статус устройства (например, active, inactive, error)
+        additional_info:
+          type: string
+          description: Дополнительная информация
+    DeviceCreateRequest:
+      type: object
+      required:
+        - house_id
+        - type_id
+        - model_id
+        - serial_number
+      properties:
+        parent_module_id:
+          type: integer
+          nullable: true
+        house_id:
+          type: integer
+        type_id:
+          type: integer
+        model_id:
+          type: integer
+        serial_number:
+          type: string
+        status:
+          type: string
+          default: active
+        additional_info:
+          type: string
+    DeviceUpdateRequest:
+      type: object
+      properties:
+        parent_module_id:
+          type: integer
+          nullable: true
+        status:
+          type: string
+        additional_info:
+          type: string
+
+    DeviceType:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+    Model:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+
+    Operation:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        parameters:
+          type: object
+          description: Схема входных параметров операции (опционально)
+          additionalProperties: true
+    OperationResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          description: Любые дополнительные данные результата
+          additionalProperties: true
